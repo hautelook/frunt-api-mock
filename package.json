@@ -1,13 +1,17 @@
 {
-  "name": "api-mock",
+  "name": "frunt-api-mock",
   "version": "1.0.0",
   "description": "Configurable server for mocked api requests",
   "private": true,
   "jsnext:main": "lib/index.js",
+  "bin": {
+    "frunt-api-mock": "./bin/frunt-api-mock.js"
+  },
   "files": [
     "dist",
     "lib",
-    "src"
+    "src",
+    "bin"
   ],
   "scripts": {
     "test": "./scipts/test",
@@ -21,7 +25,8 @@
     "http-status-codes": "^1.0.5",
     "lodash": "^3.10.1",
     "request": "^2.67.0",
-    "tcomb": "^2.5.2"
+    "tcomb": "^2.5.2",
+    "yargs": "^3.31.0"
   },
   "devDependencies": {
     "babel": "5.8.34",

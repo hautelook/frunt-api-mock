@@ -3,48 +3,38 @@
 Object.defineProperty(exports, '__esModule', {
     value: true
 });
-exports['default'] = start;
+exports['default'] = mock;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _client = require('./client');
+var _request = require('request');
 
-var _client2 = _interopRequireDefault(_client);
+var _request2 = _interopRequireDefault(_request);
 
-var _lodash = require('lodash');
+function mock(host, url, _ref) {
+    var status = _ref.status;
+    var headers = _ref.headers;
+    var text = _ref.text;
+    var method = _ref.method;
 
-var _child_process = require('child_process');
-
-var _child_process2 = _interopRequireDefault(_child_process);
-
-function start(port) {
-
-    var child = _child_process2['default'].fork(__dirname + '/create_server', [port]);
+    console.log('adding response for', url);
 
     return new Promise(function (resolve, reject) {
-
-        var timeoutId = setTimeout(function () {
-            child.kill();
-            reject();
-        }, 3000);
-
-        child.on('message', function (message) {
-            if (message === 'started.server') {
-                clearTimeout(timeoutId);
-                resolve({
-                    add: (0, _lodash.partial)(_client2['default'], 'http://localhost:' + port),
-                    stop: function stop() {
-                        child.kill();
-                    }
-                });
-            } else {
-                reject();
+        _request2['default'].post({
+            url: host + '/respond-with',
+            json: true,
+            qs: { url: url },
+            body: { status: status, headers: headers, text: text, method: method }
+        }, function (err, res) {
+            if (err) {
+                console.err('failed to load response for', url, err.message);
+                return reject(err);
             }
-        });
-    });
 
-    process.on('uncaughException', function () {
-        child.kill();
+            console.log('added response for', url);
+
+            resolve(res);
+        });
     });
 }
 

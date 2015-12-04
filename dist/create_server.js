@@ -12,14 +12,11 @@ var _server2 = _interopRequireDefault(_server);
 
 var _lodash = require('lodash');
 
-exports['default'] = (function () {
-    var server = (0, _server2['default'])((0, _lodash.last)(process.argv), null, function () {
-        process.send('started.server');
+exports['default'] = function (port) {
+    return (0, _server2['default'])(port, null, function () {
+        console.log('mock server started.');
     });
+};
 
-    process.on('close', function () {
-        server.close();
-    });
-})();
-
+;
 module.exports = exports['default'];
