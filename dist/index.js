@@ -64,9 +64,9 @@ function clearAll(host) {
     });
 }
 
-function createMock(host, url) {
+function createMock(host) {
     return {
-        add: (0, _lodash.partial)(addResponse, host, url),
+        add: (0, _lodash.partial)(addResponse, host),
         clear: (0, _lodash.partial)(clearAll, host)
     };
 }
