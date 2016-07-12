@@ -79,7 +79,8 @@ describe('server', () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Set-Cookie': [
-                        'SOMECOOKIE=1; expires=Fri, 02-Dec-2016 00:26:52 GMT; Max-Age=31622400; path=/; domain=.test.com'
+                        'SOMECOOKIE=1; Max-Age=31622400; path=/; domain=.test.com',
+                        'SOMECOOKIE2=1; Max-Age=31622400; path=/; domain=.test.com'
                     ]
                 },
                 text: '{"foo":"bar"}'
@@ -90,7 +91,8 @@ describe('server', () => {
             request(app)
                 .get('/foo/bar')
                 .expect('Content-Type', 'application/json; charset=utf-8')
-                .expect('Set-Cookie', 'SOMECOOKIE=1; expires=Fri, 02-Dec-2016 00:26:52 GMT; Max-Age=31622400; path=/; domain=.test.com')
+                .expect('Set-Cookie', 'SOMECOOKIE=1; Max-Age=31622400; path=/; domain=.test.com,' +
+                    'SOMECOOKIE2=1; Max-Age=31622400; path=/; domain=.test.com')
                 .expect(200, {foo: 'bar'}, done);
         });
 
@@ -98,7 +100,8 @@ describe('server', () => {
             request(app)
                 .post('/foo/bar')
                 .expect('Content-Type', 'application/json; charset=utf-8')
-                .expect('Set-Cookie', 'SOMECOOKIE=1; expires=Fri, 02-Dec-2016 00:26:52 GMT; Max-Age=31622400; path=/; domain=.test.com')
+                .expect('Set-Cookie', 'SOMECOOKIE=1; Max-Age=31622400; path=/; domain=.test.com,' +
+                    'SOMECOOKIE2=1; Max-Age=31622400; path=/; domain=.test.com')
                 .expect(200, {foo: 'bar'}, done);
         });
 
@@ -106,7 +109,8 @@ describe('server', () => {
             request(app)
                 .post('/foo/bar')
                 .expect('Content-Type', 'application/json; charset=utf-8')
-                .expect('Set-Cookie', 'SOMECOOKIE=1; expires=Fri, 02-Dec-2016 00:26:52 GMT; Max-Age=31622400; path=/; domain=.test.com')
+                .expect('Set-Cookie', 'SOMECOOKIE=1; Max-Age=31622400; path=/; domain=.test.com,' +
+                    'SOMECOOKIE2=1; Max-Age=31622400; path=/; domain=.test.com')
                 .expect(200, {foo: 'bar'}, done);
         });
 
@@ -114,7 +118,8 @@ describe('server', () => {
             request(app)
                 .post('/foo/bar')
                 .expect('Content-Type', 'application/json; charset=utf-8')
-                .expect('Set-Cookie', 'SOMECOOKIE=1; expires=Fri, 02-Dec-2016 00:26:52 GMT; Max-Age=31622400; path=/; domain=.test.com')
+                .expect('Set-Cookie', 'SOMECOOKIE=1; Max-Age=31622400; path=/; domain=.test.com,' +
+                    'SOMECOOKIE2=1; Max-Age=31622400; path=/; domain=.test.com')
                 .expect(200, {foo: 'bar'}, done);
         });
     });

@@ -77,14 +77,7 @@ function responseAllHandler(responses) {
         }
 
         (0, _lodash.map)(headers, function (value, key) {
-
-            if ((0, _lodash.isArray)(value)) {
-                return (0, _lodash.map)(value, function (v) {
-                    res.set(key, v);
-                });
-            }
-
-            return res.set(key, value);
+            return res.append(key, value);
         });
 
         if ((0, _helpers.isJSON)(headers)) {
