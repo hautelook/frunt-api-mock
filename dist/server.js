@@ -4,7 +4,6 @@ Object.defineProperty(exports, '__esModule', {
     value: true
 });
 exports.queueResponse = queueResponse;
-exports.deleteResponse = deleteResponse;
 exports.createDefaultRouter = createDefaultRouter;
 exports.createExpressApp = createExpressApp;
 exports['default'] = createExpressServer;
@@ -27,22 +26,12 @@ var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-function queueResponse(responses, url, _ref) {
-    var status = _ref.status;
-    var headers = _ref.headers;
-    var text = _ref.text;
-    var method = _ref.method;
+var _lodash = require('lodash');
 
-    return responses.set(url, {
-        status: status,
-        headers: headers,
-        text: text,
-        method: method
-    });
-}
+var _helpers = require('./helpers');
 
-function deleteResponse(responses, url) {
-    return responses.has(url) ? responses['delete'](url) : false;
+function queueResponse(responses, url, params) {
+    return responses.set((0, _helpers.getKeyHash)(url), params);
 }
 
 function respondWithPostHandler(responses) {
@@ -60,35 +49,48 @@ function respondWithPostHandler(responses) {
 
 function respondWithDeleteHandler(responses) {
     return function (req, res) {
-
-        if (!req.query.url) {
-            res.sendStatus(_httpStatusCodes2['default'].NOT_ACCEPTABLE);
-        }
-
-        deleteResponse(responses, req.query.url) ? res.sendStatus(_httpStatusCodes2['default'].OK) : res.sendStatus(_httpStatusCodes2['default'].NOT_FOUND);
+        responses.clear();
+        res.sendStatus(_httpStatusCodes2['default'].OK);
     };
 }
 
 function responseAllHandler(responses) {
     return function (req, res) {
-        if (responses.has(req.originalUrl)) {
-            var _responses$get = responses.get(req.originalUrl);
+        if (!responses.has((0, _helpers.getKeyHash)(req.originalUrl))) {
+            return res.sendStatus(_httpStatusCodes2['default'].NOT_FOUND);
+        }
 
-            var _status = _responses$get.status;
-            var headers = _responses$get.headers;
-            var text = _responses$get.text;
-            var method = _responses$get.method;
+        var _responses$get = responses.get((0, _helpers.getKeyHash)(req.originalUrl));
 
-            if (method && req.method !== method) {
-                res.sendStatus(_httpStatusCodes2['default'].METHOD_NOT_ALLOWED);
-                return;
+        var status = _responses$get.status;
+        var headers = _responses$get.headers;
+        var text = _responses$get.text;
+        var method = _responses$get.method;
+        var body = _responses$get.body;
+
+        if ((method && req.method) !== method) {
+            return res.sendStatus(_httpStatusCodes2['default'].METHOD_NOT_ALLOWED);
+        }
+
+        if (body && body !== req.body) {
+            return res.sendStatus(_httpStatusCodes2['default'].BAD_REQUEST);
+        }
+
+        (0, _lodash.map)(headers, function (value, key) {
+
+            if ((0, _lodash.isArray)(value)) {
+                return (0, _lodash.map)(value, function (v) {
+                    res.set(key, v);
+                });
             }
 
-            res.set(headers);
+            return res.set(key, value);
+        });
 
-            res.status(_status).send(JSON.parse(text));
+        if ((0, _helpers.isJSON)(headers)) {
+            res.status(status).send(JSON.parse(text));
         } else {
-            res.sendStatus(_httpStatusCodes2['default'].NOT_FOUND);
+            res.status(status).send(text);
         }
     };
 }
@@ -104,14 +106,15 @@ function createDefaultRouter(responseQueue) {
     return router;
 }
 
-function createExpressApp(_ref2) {
-    var router = _ref2.router;
+function createExpressApp(_ref) {
+    var router = _ref.router;
 
     var app = (0, _express2['default'])();
 
     app.enable('trust proxy');
     app.disable('x-powered-by');
-    app.use(_bodyParser2['default'].json());
+    app.use(_bodyParser2['default'].json({ limit: '5mb' }));
+    app.use(_bodyParser2['default'].urlencoded({ limit: '5mb' }));
     app.use(router);
 
     return app;
