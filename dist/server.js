@@ -49,7 +49,14 @@ function respondWithPostHandler(responses) {
 
 function respondWithDeleteHandler(responses) {
     return function (req, res) {
-        responses.clear();
+        var url = req.query.url;
+
+        if (url) {
+            responses['delete']((0, _helpers.getKeyHash)(url));
+        } else {
+            responses.clear();
+        }
+
         res.sendStatus(_httpStatusCodes2['default'].OK);
     };
 }

@@ -1,6 +1,7 @@
 import { createExpressApp, createDefaultRouter, queueResponse } from '../../lib/server';
 import { getKeyHash } from '../../lib/helpers';
 import request from 'supertest';
+import { map } from 'lodash';
 
 describe('server', () => {
 
@@ -10,7 +11,7 @@ describe('server', () => {
             router: createDefaultRouter(responses)
         });
 
-        return { app, responses};
+        return { app, responses };
     }
 
     describe('POST /respond-with', () => {
@@ -50,6 +51,38 @@ describe('server', () => {
     });
 
     describe('DELETE /respond-with', () => {
+
+        it('can delete a specific response', done => {
+
+            const { app, responses } = createMockApp();
+            const urls = ['/one', '/two', '/three'];
+
+            Promise.all(
+              map(urls, url => {
+                  return request(app)
+                    .post(`/respond-with?url=${url}`)
+                    .send({ status: 200, headers: {}, method: 'GET', text: '{"key":"val"}' })
+              })
+            ).then(() => {
+                const [ first ] = urls;
+
+                expect(responses.size).to.eql(urls.length);
+                expect(responses.has(getKeyHash(first))).to.be.true;
+
+                request(app)
+                    .delete(`/respond-with?url=${first}`)
+                    .expect(200)
+                    .end(() => {
+                        expect(responses.size).to.eql(urls.length - 1);
+                        expect(responses.has(getKeyHash(first))).to.be.false;
+                        request(app)
+                            .get(first)
+                            .expect(404, done);
+                    });
+
+            });
+
+        });
 
         it('deletes all existing responses', (done) => {
 

@@ -45,19 +45,36 @@ function addResponse(host, url, _ref) {
     });
 }
 
+function clearOne(host, url) {
+    console.log('clearing ' + host + url);
+
+    return clear(host, {
+        qs: { url: url }
+    }, function () {
+        console.log('cleared ' + host + url);
+    });
+}
+
 function clearAll(host) {
     console.log('clearing all responses');
+
+    return clear(host, {}, function () {
+        console.log('cleared all responses');
+    });
+}
+
+function clear(host, options, cb) {
     return new Promise(function (resolve, reject) {
-        (0, _request2['default'])({
+        (0, _request2['default'])((0, _lodash.assign)({
             method: 'DELETE',
             url: host + '/respond-with'
-        }, function (err, res) {
+        }, options), function (err, res) {
             if (err) {
                 console.err('failed clear responses', err.message);
                 return reject(err);
             }
 
-            console.log('cleared all responses');
+            (0, _lodash.isFunction)(cb) && cb();
 
             resolve(res);
         });
@@ -67,6 +84,7 @@ function clearAll(host) {
 function createMock(host) {
     return {
         add: (0, _lodash.partial)(addResponse, host),
+        reset: (0, _lodash.partial)(clearOne, host),
         clear: (0, _lodash.partial)(clearAll, host)
     };
 }
