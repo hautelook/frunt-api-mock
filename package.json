@@ -1,6 +1,6 @@
 {
   "name": "frunt-api-mock",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Configurable server for mocked api requests",
   "private": true,
   "jsnext:main": "lib/index.js",
@@ -14,7 +14,7 @@
     "bin"
   ],
   "scripts": {
-    "test": "./scipts/test",
+    "test": "./scripts/test",
     "build": "./node_modules/.bin/babel ./lib --out-dir ./dist"
   },
   "main": "dist/index.js",
