@@ -23,7 +23,7 @@
     "body-parser": "1.14.2",
     "express": "4.13.3",
     "http-status-codes": "1.0.5",
-    "lodash": "3.10.1",
+    "lodash": "4.17.19",
     "request": "2.67.0",
     "tcomb": "2.5.2",
     "yargs": "3.31.0"
